@@ -1,15 +1,9 @@
 import { Probot } from "probot";
 
+// Docs: https://probot.github.io/docs/
+// Possible events: https://github.com/octokit/webhooks.js/#webhook-events (app.on(["event", "event"]) | app.on("event") | app.on("event.action"))
 export default (app: Probot) => {
-  app.on("issues.opened", async (context) => {
-    const issueComment = context.issue({
-      body: "Thanks for opening this issue!",
-    });
-    await context.octokit.issues.createComment(issueComment);
+  app.onAny(async (context) => {
+    app.log.info({ event: context.name, payload: context.payload });
   });
-  // For more information on building apps:
-  // https://probot.github.io/docs/
-
-  // To get your app running against GitHub, see:
-  // https://probot.github.io/docs/development/
 };
