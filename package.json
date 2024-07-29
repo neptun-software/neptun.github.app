@@ -15,18 +15,19 @@
     "build": "tsc",
     "start": "probot run ./lib/index.js",
     "test": "vitest",
-    "dev": "LOG_LEVEL=trace npm start",
+    "dev": "npm run build && cross-env LOG_LEVEL=trace npm run start",
     "postinstall": "npm run build"
   },
   "dependencies": {
+    "cross-env": "^7.0.3",
     "probot": "^13.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "nock": "^14.0.0-beta.5",
     "smee-client": "^2.0.0",
-    "vitest": "^1.3.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.3.1"
   },
   "engines": {
     "node": ">= 18"
