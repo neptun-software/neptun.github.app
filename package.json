@@ -5,7 +5,7 @@
   "description": "The official neptun-software GitHub App.",
   "author": "Jonas Fröller",
   "license": "ISC",
-  "homepage": "https://github.com//",
+  "homepage": "https://neptun-github-app.vercel.app",
   "keywords": [
     "probot",
     "github",
