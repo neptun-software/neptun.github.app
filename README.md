@@ -1,6 +1,8 @@
 # neptun-github-app
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) that The official neptun-software GitHub App.
+The official neptun-software GitHub App.
+
+> A GitHub App built with [Probot](https://github.com/probot/probot).
 
 ## Setup
 
