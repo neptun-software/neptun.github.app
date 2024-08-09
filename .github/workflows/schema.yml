@@ -1,0 +1,33 @@
+name: Sync Database Schemas
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # run every 10 minutes
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Pull Schema
+        run: |
+          npm run db:pull
+          npx @biomejs/biome format --write ./database/migrations
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+
+      - name: Log Pull Request Info
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"

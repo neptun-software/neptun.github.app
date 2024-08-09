@@ -16,14 +16,22 @@
     "start": "probot run ./lib/index.js",
     "test": "vitest",
     "dev": "npm run build && cross-env LOG_LEVEL=trace npm run start",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "lint": "biome ci .",
+    "format-organize-lint": "npx @biomejs/biome format --write ./src ./api ./database/migrations",
+    "db:pull": "drizzle-kit introspect --config drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
+    "drizzle-orm": "^0.33.0",
+    "postgres": "^3.4.4",
     "probot": "^13.0.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
     "@types/node": "^20.0.0",
+    "drizzle-kit": "^0.24.0",
     "nock": "^14.0.0-beta.5",
     "smee-client": "^2.0.0",
     "typescript": "^5.3.3",
