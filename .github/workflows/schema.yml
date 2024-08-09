@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+      DATABASE_CONNECTION_STRING: ${{ secrets.DATABASE_CONNECTION_STRING }}
 
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +19,7 @@ jobs:
 
       - name: Pull Schema
         run: |
+          npm ci
           npm run db:pull
           npx @biomejs/biome format --write ./database/migrations
 
