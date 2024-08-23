@@ -1,12 +1,12 @@
 import {
 	pgTable,
-	unique,
+	foreignKey,
 	pgEnum,
 	serial,
 	text,
 	timestamp,
-	foreignKey,
 	integer,
+	unique,
 	boolean,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -24,33 +24,15 @@ export const oauthProviderEnum = pgEnum("oauth_provider_enum", [
 	"google",
 ]);
 
-export const chatUser = pgTable(
-	"chat_user",
-	{
-		id: serial("id").primaryKey().notNull(),
-		primaryEmail: text("primary_email").notNull(),
-		hashedPassword: text("hashed_password"),
-		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	},
-	(table) => {
-		return {
-			chatUserPrimaryEmailUnique: unique("chat_user_primary_email_unique").on(
-				table.primaryEmail,
-			),
-		};
-	},
-);
-
 export const chatConversation = pgTable("chat_conversation", {
 	id: serial("id").primaryKey().notNull(),
 	name: text("name").notNull(),
 	model: aiModelEnum("model").notNull(),
 	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	chatUserId: integer("chat_user_id")
+	neptunUserId: integer("neptun_user_id")
 		.notNull()
-		.references(() => chatUser.id, { onDelete: "cascade" }),
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
 });
 
 export const chatConversationFile = pgTable("chat_conversation_file", {
@@ -61,9 +43,9 @@ export const chatConversationFile = pgTable("chat_conversation_file", {
 	text: text("text").notNull(),
 	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	chatUserId: integer("chat_user_id")
+	neptunUserId: integer("neptun_user_id")
 		.notNull()
-		.references(() => chatUser.id, { onDelete: "cascade" }),
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
 	chatConversationId: integer("chat_conversation_id")
 		.notNull()
 		.references(() => chatConversation.id, { onDelete: "cascade" }),
@@ -78,44 +60,59 @@ export const chatConversationMessage = pgTable("chat_conversation_message", {
 	actor: chatConversationMessageActorEnum("actor").default("user").notNull(),
 	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	chatUserId: integer("chat_user_id")
+	neptunUserId: integer("neptun_user_id")
 		.notNull()
-		.references(() => chatUser.id, { onDelete: "cascade" }),
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
 	chatConversationId: integer("chat_conversation_id")
 		.notNull()
 		.references(() => chatConversation.id, { onDelete: "cascade" }),
 });
 
-export const chatUserOauthAccount = pgTable("chat_user_oauth_account", {
+export const neptunUser = pgTable(
+	"neptun_user",
+	{
+		id: serial("id").primaryKey().notNull(),
+		primaryEmail: text("primary_email").notNull(),
+		hashedPassword: text("hashed_password"),
+		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+	},
+	(table) => {
+		return {
+			neptunUserPrimaryEmailUnique: unique(
+				"neptun_user_primary_email_unique",
+			).on(table.primaryEmail),
+		};
+	},
+);
+
+export const neptunUserOauthAccount = pgTable("neptun_user_oauth_account", {
 	id: serial("id").primaryKey().notNull(),
 	provider: oauthProviderEnum("provider").notNull(),
 	oauthUserId: text("oauth_user_id").notNull(),
 	oauthEmail: text("oauth_email").notNull(),
 	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	chatUserId: integer("chat_user_id")
+	neptunUserId: integer("neptun_user_id")
 		.notNull()
-		.references(() => chatUser.id, { onDelete: "cascade" }),
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
 });
 
-export const chatGithubAppInstallation = pgTable(
-	"chat_github_app_installation",
-	{
-		id: serial("id").primaryKey().notNull(),
-		githubAccountType: text("github_account_type").notNull(),
-		githubAccountAvatarUrl: text("github_account_avatar_url").notNull(),
-		githubAccountId: integer("github_account_id").notNull(),
-		githubAccountName: text("github_account_name"),
-		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-		chatUserId: integer("chat_user_id")
-			.notNull()
-			.references(() => chatUser.id, { onDelete: "cascade" }),
-	},
-);
+export const githubAppInstallation = pgTable("github_app_installation", {
+	id: serial("id").primaryKey().notNull(),
+	githubAccountType: text("github_account_type").notNull(),
+	githubAccountAvatarUrl: text("github_account_avatar_url").notNull(),
+	githubAccountId: integer("github_account_id").notNull(),
+	githubAccountName: text("github_account_name"),
+	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+	neptunUserId: integer("neptun_user_id")
+		.notNull()
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
+});
 
-export const chatGithubAppInstallationRepository = pgTable(
-	"chat_github_app_installation_repository",
+export const githubAppInstallationRepository = pgTable(
+	"github_app_installation_repository",
 	{
 		id: serial("id").primaryKey().notNull(),
 		githubRepositoryId: integer("github_repository_id").notNull(),
@@ -137,8 +134,8 @@ export const chatGithubAppInstallationRepository = pgTable(
 		).notNull(),
 		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-		chatGithubAppInstallationId: integer("chat_github_app_installation_id")
+		githubAppInstallationId: integer("github_app_installation_id")
 			.notNull()
-			.references(() => chatGithubAppInstallation.id, { onDelete: "cascade" }),
+			.references(() => githubAppInstallation.id, { onDelete: "cascade" }),
 	},
 );

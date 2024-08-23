@@ -1,40 +1,40 @@
 import { relations } from "drizzle-orm/relations";
 import {
-	chatUser,
+	neptunUser,
 	chatConversation,
 	chatConversationFile,
 	chatConversationMessage,
-	chatUserOauthAccount,
-	chatGithubAppInstallation,
-	chatGithubAppInstallationRepository,
+	neptunUserOauthAccount,
+	githubAppInstallation,
+	githubAppInstallationRepository,
 } from "./schema";
 
 export const chatConversationRelations = relations(
 	chatConversation,
 	({ one, many }) => ({
-		chatUser: one(chatUser, {
-			fields: [chatConversation.chatUserId],
-			references: [chatUser.id],
+		neptunUser: one(neptunUser, {
+			fields: [chatConversation.neptunUserId],
+			references: [neptunUser.id],
 		}),
 		chatConversationFiles: many(chatConversationFile),
 		chatConversationMessages: many(chatConversationMessage),
 	}),
 );
 
-export const chatUserRelations = relations(chatUser, ({ many }) => ({
+export const neptunUserRelations = relations(neptunUser, ({ many }) => ({
 	chatConversations: many(chatConversation),
 	chatConversationFiles: many(chatConversationFile),
 	chatConversationMessages: many(chatConversationMessage),
-	chatUserOauthAccounts: many(chatUserOauthAccount),
-	chatGithubAppInstallations: many(chatGithubAppInstallation),
+	neptunUserOauthAccounts: many(neptunUserOauthAccount),
+	githubAppInstallations: many(githubAppInstallation),
 }));
 
 export const chatConversationFileRelations = relations(
 	chatConversationFile,
 	({ one }) => ({
-		chatUser: one(chatUser, {
-			fields: [chatConversationFile.chatUserId],
-			references: [chatUser.id],
+		neptunUser: one(neptunUser, {
+			fields: [chatConversationFile.neptunUserId],
+			references: [neptunUser.id],
 		}),
 		chatConversation: one(chatConversation, {
 			fields: [chatConversationFile.chatConversationId],
@@ -51,9 +51,9 @@ export const chatConversationMessageRelations = relations(
 	chatConversationMessage,
 	({ one, many }) => ({
 		chatConversationFiles: many(chatConversationFile),
-		chatUser: one(chatUser, {
-			fields: [chatConversationMessage.chatUserId],
-			references: [chatUser.id],
+		neptunUser: one(neptunUser, {
+			fields: [chatConversationMessage.neptunUserId],
+			references: [neptunUser.id],
 		}),
 		chatConversation: one(chatConversation, {
 			fields: [chatConversationMessage.chatConversationId],
@@ -62,35 +62,33 @@ export const chatConversationMessageRelations = relations(
 	}),
 );
 
-export const chatUserOauthAccountRelations = relations(
-	chatUserOauthAccount,
+export const neptunUserOauthAccountRelations = relations(
+	neptunUserOauthAccount,
 	({ one }) => ({
-		chatUser: one(chatUser, {
-			fields: [chatUserOauthAccount.chatUserId],
-			references: [chatUser.id],
+		neptunUser: one(neptunUser, {
+			fields: [neptunUserOauthAccount.neptunUserId],
+			references: [neptunUser.id],
 		}),
 	}),
 );
 
-export const chatGithubAppInstallationRelations = relations(
-	chatGithubAppInstallation,
+export const githubAppInstallationRelations = relations(
+	githubAppInstallation,
 	({ one, many }) => ({
-		chatUser: one(chatUser, {
-			fields: [chatGithubAppInstallation.chatUserId],
-			references: [chatUser.id],
+		neptunUser: one(neptunUser, {
+			fields: [githubAppInstallation.neptunUserId],
+			references: [neptunUser.id],
 		}),
-		chatGithubAppInstallationRepositories: many(
-			chatGithubAppInstallationRepository,
-		),
+		githubAppInstallationRepositories: many(githubAppInstallationRepository),
 	}),
 );
 
-export const chatGithubAppInstallationRepositoryRelations = relations(
-	chatGithubAppInstallationRepository,
+export const githubAppInstallationRepositoryRelations = relations(
+	githubAppInstallationRepository,
 	({ one }) => ({
-		chatGithubAppInstallation: one(chatGithubAppInstallation, {
-			fields: [chatGithubAppInstallationRepository.chatGithubAppInstallationId],
-			references: [chatGithubAppInstallation.id],
+		githubAppInstallation: one(githubAppInstallation, {
+			fields: [githubAppInstallationRepository.githubAppInstallationId],
+			references: [githubAppInstallation.id],
 		}),
 	}),
 );
