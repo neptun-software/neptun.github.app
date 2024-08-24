@@ -145,7 +145,7 @@ export const chatConversationShare = pgTable(
 	"chat_conversation_share",
 	{
 		id: serial("id").primaryKey().notNull(),
-		isShared: boolean("is_shared").default(false).notNull(),
+		isShared: boolean("is_shared").default(true).notNull(),
 		shareId: uuid("share_id").defaultRandom().notNull(),
 		isProtected: boolean("is_protected").default(false).notNull(),
 		hashedPassword: text("hashed_password"),
