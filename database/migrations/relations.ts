@@ -7,6 +7,8 @@ import {
 	neptunUserOauthAccount,
 	githubAppInstallation,
 	githubAppInstallationRepository,
+	chatConversationShare,
+	chatConversationShareWhitelistEntry,
 } from "./schema";
 
 export const chatConversationRelations = relations(
@@ -18,6 +20,7 @@ export const chatConversationRelations = relations(
 		}),
 		chatConversationFiles: many(chatConversationFile),
 		chatConversationMessages: many(chatConversationMessage),
+		chatConversationShares: many(chatConversationShare),
 	}),
 );
 
@@ -27,6 +30,9 @@ export const neptunUserRelations = relations(neptunUser, ({ many }) => ({
 	chatConversationMessages: many(chatConversationMessage),
 	neptunUserOauthAccounts: many(neptunUserOauthAccount),
 	githubAppInstallations: many(githubAppInstallation),
+	chatConversationShareWhitelistEntries: many(
+		chatConversationShareWhitelistEntry,
+	),
 }));
 
 export const chatConversationFileRelations = relations(
@@ -89,6 +95,33 @@ export const githubAppInstallationRepositoryRelations = relations(
 		githubAppInstallation: one(githubAppInstallation, {
 			fields: [githubAppInstallationRepository.githubAppInstallationId],
 			references: [githubAppInstallation.id],
+		}),
+	}),
+);
+
+export const chatConversationShareRelations = relations(
+	chatConversationShare,
+	({ one, many }) => ({
+		chatConversation: one(chatConversation, {
+			fields: [chatConversationShare.chatConversationId],
+			references: [chatConversation.id],
+		}),
+		chatConversationShareWhitelistEntries: many(
+			chatConversationShareWhitelistEntry,
+		),
+	}),
+);
+
+export const chatConversationShareWhitelistEntryRelations = relations(
+	chatConversationShareWhitelistEntry,
+	({ one }) => ({
+		neptunUser: one(neptunUser, {
+			fields: [chatConversationShareWhitelistEntry.whitelistedNeptunUserId],
+			references: [neptunUser.id],
+		}),
+		chatConversationShare: one(chatConversationShare, {
+			fields: [chatConversationShareWhitelistEntry.chatConversationShareId],
+			references: [chatConversationShare.id],
 		}),
 	}),
 );
