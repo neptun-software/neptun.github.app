@@ -8,6 +8,7 @@ import {
 	integer,
 	unique,
 	boolean,
+	uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -137,5 +138,46 @@ export const githubAppInstallationRepository = pgTable(
 		githubAppInstallationId: integer("github_app_installation_id")
 			.notNull()
 			.references(() => githubAppInstallation.id, { onDelete: "cascade" }),
+	},
+);
+
+export const chatConversationShare = pgTable(
+	"chat_conversation_share",
+	{
+		id: serial("id").primaryKey().notNull(),
+		isShared: boolean("is_shared").default(false).notNull(),
+		shareId: uuid("share_id").defaultRandom().notNull(),
+		isProtected: boolean("is_protected").default(false).notNull(),
+		hashedPassword: text("hashed_password"),
+		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+		chatConversationId: integer("chat_conversation_id")
+			.notNull()
+			.references(() => chatConversation.id, { onDelete: "cascade" }),
+	},
+	(table) => {
+		return {
+			chatConversationShareShareIdUnique: unique(
+				"chat_conversation_share_share_id_unique",
+			).on(table.shareId),
+			chatConversationShareChatConversationIdUnique: unique(
+				"chat_conversation_share_chat_conversation_id_unique",
+			).on(table.chatConversationId),
+		};
+	},
+);
+
+export const chatConversationShareWhitelistEntry = pgTable(
+	"chat_conversation_share_whitelist_entry",
+	{
+		id: serial("id").primaryKey().notNull(),
+		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+		whitelistedNeptunUserId: integer("whitelisted_neptun_user_id")
+			.notNull()
+			.references(() => neptunUser.id, { onDelete: "cascade" }),
+		chatConversationShareId: integer("chat_conversation_share_id")
+			.notNull()
+			.references(() => chatConversationShare.id, { onDelete: "cascade" }),
 	},
 );
