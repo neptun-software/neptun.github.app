@@ -15,6 +15,7 @@ import { sql } from "drizzle-orm";
 export const aiModelEnum = pgEnum("ai_model_enum", [
 	"OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
 	"mistralai/Mistral-7B-Instruct-v0.1",
+	"meta-llama/Meta-Llama-3-8B-Instruct",
 ]);
 export const chatConversationMessageActorEnum = pgEnum(
 	"chat_conversation_message_actor_enum",
