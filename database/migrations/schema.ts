@@ -1,6 +1,5 @@
 import {
 	pgTable,
-	foreignKey,
 	pgEnum,
 	serial,
 	text,
@@ -10,7 +9,6 @@ import {
 	boolean,
 	uuid,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 export const aiModelEnum = pgEnum("ai_model_enum", [
 	"OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",

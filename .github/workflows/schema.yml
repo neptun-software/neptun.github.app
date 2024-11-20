@@ -21,6 +21,7 @@ jobs:
         run: |
           npm ci
           npm run db:pull
+          npx @biomejs/biome lint --write ./database/migrations
           npx @biomejs/biome format --write ./database/migrations
 
       - name: Fix Import Paths
