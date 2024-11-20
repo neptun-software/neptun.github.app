@@ -9,7 +9,7 @@ import {
 	githubAppInstallationRepository,
 	chatConversationShare,
 	chatConversationShareWhitelistEntry,
-} from "./schema";
+} from "./schema.js";
 
 export const chatConversationRelations = relations(
 	chatConversation,

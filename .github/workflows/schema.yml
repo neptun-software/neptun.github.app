@@ -23,6 +23,11 @@ jobs:
           npm run db:pull
           npx @biomejs/biome format --write ./database/migrations
 
+      - name: Fix Import Paths
+        run: |
+          # Replace "./schema" with "./schema.js" (Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext')
+          sed -i 's|"./schema"|"./schema.js"|g' ./database/migrations/relations.ts
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v6
