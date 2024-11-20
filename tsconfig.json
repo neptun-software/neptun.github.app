@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true, // some types in external dependencies seem to be missing somehow
+
     "incremental": true,
     "target": "es2022",
     "module": "Node16",
