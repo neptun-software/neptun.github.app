@@ -12,8 +12,8 @@ import {
 
 export const aiModelEnum = pgEnum("ai_model_enum", [
 	"OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
-	"mistralai/Mistral-7B-Instruct-v0.1",
 	"meta-llama/Meta-Llama-3-8B-Instruct",
+	"mistralai/Mistral-7B-Instruct-v0.1",
 ]);
 export const chatConversationMessageActorEnum = pgEnum(
 	"chat_conversation_message_actor_enum",
@@ -33,39 +33,6 @@ export const chatConversation = pgTable("chat_conversation", {
 	neptunUserId: integer("neptun_user_id")
 		.notNull()
 		.references(() => neptunUser.id, { onDelete: "cascade" }),
-});
-
-export const chatConversationFile = pgTable("chat_conversation_file", {
-	id: serial("id").primaryKey().notNull(),
-	title: text("title"),
-	language: text("language").default("text").notNull(),
-	fileExtension: text("file_extension").default("txt").notNull(),
-	text: text("text").notNull(),
-	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	neptunUserId: integer("neptun_user_id")
-		.notNull()
-		.references(() => neptunUser.id, { onDelete: "cascade" }),
-	chatConversationId: integer("chat_conversation_id")
-		.notNull()
-		.references(() => chatConversation.id, { onDelete: "cascade" }),
-	chatConversationMessageId: integer("chat_conversation_message_id")
-		.notNull()
-		.references(() => chatConversationMessage.id, { onDelete: "cascade" }),
-});
-
-export const chatConversationMessage = pgTable("chat_conversation_message", {
-	id: serial("id").primaryKey().notNull(),
-	message: text("message").notNull(),
-	actor: chatConversationMessageActorEnum("actor").default("user").notNull(),
-	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	neptunUserId: integer("neptun_user_id")
-		.notNull()
-		.references(() => neptunUser.id, { onDelete: "cascade" }),
-	chatConversationId: integer("chat_conversation_id")
-		.notNull()
-		.references(() => chatConversation.id, { onDelete: "cascade" }),
 });
 
 export const neptunUser = pgTable(
@@ -96,6 +63,38 @@ export const neptunUserOauthAccount = pgTable("neptun_user_oauth_account", {
 	neptunUserId: integer("neptun_user_id")
 		.notNull()
 		.references(() => neptunUser.id, { onDelete: "cascade" }),
+});
+
+export const chatConversationMessage = pgTable("chat_conversation_message", {
+	id: serial("id").primaryKey().notNull(),
+	message: text("message").notNull(),
+	actor: chatConversationMessageActorEnum("actor").default("user").notNull(),
+	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+	neptunUserId: integer("neptun_user_id")
+		.notNull()
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
+	chatConversationId: integer("chat_conversation_id")
+		.notNull()
+		.references(() => chatConversation.id, { onDelete: "cascade" }),
+});
+
+export const chatConversationFile = pgTable("chat_conversation_file", {
+	id: serial("id").primaryKey().notNull(),
+	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+	neptunUserId: integer("neptun_user_id")
+		.notNull()
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
+	chatConversationId: integer("chat_conversation_id")
+		.notNull()
+		.references(() => chatConversation.id, { onDelete: "cascade" }),
+	chatConversationMessageId: integer("chat_conversation_message_id")
+		.notNull()
+		.references(() => chatConversationMessage.id, { onDelete: "cascade" }),
+	neptunUserFileId: integer("neptun_user_file_id")
+		.notNull()
+		.references(() => neptunUserFile.id, { onDelete: "cascade" }),
 });
 
 export const githubAppInstallation = pgTable("github_app_installation", {
@@ -140,6 +139,24 @@ export const githubAppInstallationRepository = pgTable(
 	},
 );
 
+export const neptunUserTemplate = pgTable("neptun_user_template", {
+	id: serial("id").primaryKey().notNull(),
+	description: text("description"),
+	fileName: text("file_name").notNull(),
+	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+	neptunUserId: integer("neptun_user_id")
+		.notNull()
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
+	templateCollectionId: integer("template_collection_id").references(
+		() => neptunUserTemplateCollection.id,
+		{ onDelete: "cascade" },
+	),
+	userFileId: integer("user_file_id").references(() => neptunUserFile.id, {
+		onDelete: "cascade",
+	}),
+});
+
 export const chatConversationShare = pgTable(
 	"chat_conversation_share",
 	{
@@ -162,6 +179,42 @@ export const chatConversationShare = pgTable(
 			chatConversationShareChatConversationIdUnique: unique(
 				"chat_conversation_share_chat_conversation_id_unique",
 			).on(table.chatConversationId),
+		};
+	},
+);
+
+export const neptunUserFile = pgTable("neptun_user_file", {
+	id: serial("id").primaryKey().notNull(),
+	title: text("title"),
+	text: text("text").notNull(),
+	language: text("language").default("text").notNull(),
+	fileExtension: text("file_extension").default("txt").notNull(),
+	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+	neptunUserId: integer("neptun_user_id")
+		.notNull()
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
+});
+
+export const neptunUserTemplateCollection = pgTable(
+	"neptun_user_template_collection",
+	{
+		id: serial("id").primaryKey().notNull(),
+		name: text("name").notNull(),
+		description: text("description"),
+		isShared: boolean("is_shared").default(false).notNull(),
+		shareId: uuid("share_id").defaultRandom().notNull(),
+		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+		neptunUserId: integer("neptun_user_id")
+			.notNull()
+			.references(() => neptunUser.id, { onDelete: "cascade" }),
+	},
+	(table) => {
+		return {
+			neptunUserTemplateCollectionShareIdUnique: unique(
+				"neptun_user_template_collection_share_id_unique",
+			).on(table.shareId),
 		};
 	},
 );
