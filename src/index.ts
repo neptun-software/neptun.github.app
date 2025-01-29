@@ -1,6 +1,6 @@
 import { Probot } from "probot";
 import { IS_DEV } from './env.js';
-import { InsertGithubAppInstallationRepositorySchema, createGithubAppInstallationRepository, deleteGithubAppInstallationRepository, updateGithubAppInstallationRepository } from "./repositories/repositories.js";
+import { InsertGithubAppInstallationRepositorySchema, createGithubAppInstallationRepository, deleteGithubAppInstallationRepository, updateGithubAppInstallationRepository } from "./repositories/github.js";
 import { filterToSchemaProperties, keepMatchingProperties } from "./utils.js";
 
 // Docs: https://probot.github.io/docs/
