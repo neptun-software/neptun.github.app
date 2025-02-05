@@ -14,6 +14,14 @@ export const aiModelEnum = pgEnum("ai_model_enum", [
 	"OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
 	"meta-llama/Meta-Llama-3-8B-Instruct",
 	"mistralai/Mistral-7B-Instruct-v0.1",
+	"qwen/Qwen2.5-72B-Instruct",
+	"qwen/Qwen2.5-Coder-32B-Instruct",
+	"deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+	"meta-llama/Llama-3.3-70B-Instruct",
+	"mistralai/Mistral-Nemo-Instruct-2407",
+	"mistralai/Mistral-7B-Instruct-v0.3",
+	"google/gemma-2-27b-it",
+	"microsoft/Phi-3-mini-4k-instruct",
 ]);
 export const chatConversationMessageActorEnum = pgEnum(
 	"chat_conversation_message_actor_enum",
