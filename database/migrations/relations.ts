@@ -8,8 +8,15 @@ import {
 	neptunUserFile,
 	githubAppInstallation,
 	githubAppInstallationRepository,
-	neptunUserTemplate,
+	neptunContextFile,
+	neptunContextImport,
+	neptunUserProject,
+	projectChatConversation,
+	projectGithubInstallation,
+	projectTemplateCollection,
 	neptunUserTemplateCollection,
+	projectUserFile,
+	neptunUserTemplate,
 	chatConversationShare,
 	chatConversationShareWhitelistEntry,
 } from "./schema.js";
@@ -23,6 +30,7 @@ export const chatConversationRelations = relations(
 		}),
 		chatConversationMessages: many(chatConversationMessage),
 		chatConversationFiles: many(chatConversationFile),
+		projectChatConversations: many(projectChatConversation),
 		chatConversationShares: many(chatConversationShare),
 	}),
 );
@@ -33,6 +41,9 @@ export const neptunUserRelations = relations(neptunUser, ({ many }) => ({
 	chatConversationMessages: many(chatConversationMessage),
 	chatConversationFiles: many(chatConversationFile),
 	githubAppInstallations: many(githubAppInstallation),
+	neptunContextFiles: many(neptunContextFile),
+	neptunContextImports: many(neptunContextImport),
+	neptunUserProjects: many(neptunUserProject),
 	neptunUserTemplates: many(neptunUserTemplate),
 	neptunUserFiles: many(neptunUserFile),
 	neptunUserTemplateCollections: many(neptunUserTemplateCollection),
@@ -92,6 +103,7 @@ export const neptunUserFileRelations = relations(
 	neptunUserFile,
 	({ one, many }) => ({
 		chatConversationFiles: many(chatConversationFile),
+		projectUserFiles: many(projectUserFile),
 		neptunUserTemplates: many(neptunUserTemplate),
 		neptunUser: one(neptunUser, {
 			fields: [neptunUserFile.neptunUserId],
@@ -108,6 +120,7 @@ export const githubAppInstallationRelations = relations(
 			references: [neptunUser.id],
 		}),
 		githubAppInstallationRepositories: many(githubAppInstallationRepository),
+		projectGithubInstallations: many(projectGithubInstallation),
 	}),
 );
 
@@ -117,6 +130,123 @@ export const githubAppInstallationRepositoryRelations = relations(
 		githubAppInstallation: one(githubAppInstallation, {
 			fields: [githubAppInstallationRepository.githubAppInstallationId],
 			references: [githubAppInstallation.id],
+		}),
+	}),
+);
+
+export const neptunContextFileRelations = relations(
+	neptunContextFile,
+	({ one }) => ({
+		neptunUser: one(neptunUser, {
+			fields: [neptunContextFile.neptunUserId],
+			references: [neptunUser.id],
+		}),
+		neptunContextImport: one(neptunContextImport, {
+			fields: [neptunContextFile.importId],
+			references: [neptunContextImport.id],
+		}),
+		neptunUserProject: one(neptunUserProject, {
+			fields: [neptunContextFile.projectId],
+			references: [neptunUserProject.id],
+		}),
+	}),
+);
+
+export const neptunContextImportRelations = relations(
+	neptunContextImport,
+	({ one, many }) => ({
+		neptunContextFiles: many(neptunContextFile),
+		neptunUser: one(neptunUser, {
+			fields: [neptunContextImport.neptunUserId],
+			references: [neptunUser.id],
+		}),
+		neptunUserProject: one(neptunUserProject, {
+			fields: [neptunContextImport.projectId],
+			references: [neptunUserProject.id],
+		}),
+	}),
+);
+
+export const neptunUserProjectRelations = relations(
+	neptunUserProject,
+	({ one, many }) => ({
+		neptunContextFiles: many(neptunContextFile),
+		neptunContextImports: many(neptunContextImport),
+		neptunUser: one(neptunUser, {
+			fields: [neptunUserProject.neptunUserId],
+			references: [neptunUser.id],
+		}),
+		projectChatConversations: many(projectChatConversation),
+		projectGithubInstallations: many(projectGithubInstallation),
+		projectTemplateCollections: many(projectTemplateCollection),
+		projectUserFiles: many(projectUserFile),
+	}),
+);
+
+export const projectChatConversationRelations = relations(
+	projectChatConversation,
+	({ one }) => ({
+		neptunUserProject: one(neptunUserProject, {
+			fields: [projectChatConversation.projectId],
+			references: [neptunUserProject.id],
+		}),
+		chatConversation: one(chatConversation, {
+			fields: [projectChatConversation.chatConversationId],
+			references: [chatConversation.id],
+		}),
+	}),
+);
+
+export const projectGithubInstallationRelations = relations(
+	projectGithubInstallation,
+	({ one }) => ({
+		neptunUserProject: one(neptunUserProject, {
+			fields: [projectGithubInstallation.projectId],
+			references: [neptunUserProject.id],
+		}),
+		githubAppInstallation: one(githubAppInstallation, {
+			fields: [projectGithubInstallation.githubInstallationId],
+			references: [githubAppInstallation.id],
+		}),
+	}),
+);
+
+export const projectTemplateCollectionRelations = relations(
+	projectTemplateCollection,
+	({ one }) => ({
+		neptunUserProject: one(neptunUserProject, {
+			fields: [projectTemplateCollection.projectId],
+			references: [neptunUserProject.id],
+		}),
+		neptunUserTemplateCollection: one(neptunUserTemplateCollection, {
+			fields: [projectTemplateCollection.templateCollectionId],
+			references: [neptunUserTemplateCollection.id],
+		}),
+	}),
+);
+
+export const neptunUserTemplateCollectionRelations = relations(
+	neptunUserTemplateCollection,
+	({ one, many }) => ({
+		projectTemplateCollections: many(projectTemplateCollection),
+		neptunUserTemplates: many(neptunUserTemplate),
+		neptunUser: one(neptunUser, {
+			fields: [neptunUserTemplateCollection.neptunUserId],
+			references: [neptunUser.id],
+		}),
+	}),
+);
+
+export const projectUserFileRelations = relations(
+	projectUserFile,
+	({ one }) => ({
+		neptunUserProject: one(neptunUserProject, {
+			fields: [projectUserFile.projectId],
+			references: [neptunUserProject.id],
+		}),
+		neptunUserFile: one(neptunUserFile, {
+			fields: [projectUserFile.userFileId],
+			references: [neptunUserFile.id],
 		}),
 	}),
 );
@@ -135,17 +265,6 @@ export const neptunUserTemplateRelations = relations(
 		neptunUserFile: one(neptunUserFile, {
 			fields: [neptunUserTemplate.userFileId],
 			references: [neptunUserFile.id],
-		}),
-	}),
-);
-
-export const neptunUserTemplateCollectionRelations = relations(
-	neptunUserTemplateCollection,
-	({ one, many }) => ({
-		neptunUserTemplates: many(neptunUserTemplate),
-		neptunUser: one(neptunUser, {
-			fields: [neptunUserTemplateCollection.neptunUserId],
-			references: [neptunUser.id],
 		}),
 	}),
 );
