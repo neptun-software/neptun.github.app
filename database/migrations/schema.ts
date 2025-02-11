@@ -1,28 +1,25 @@
 import {
 	pgTable,
+	unique,
 	pgEnum,
 	serial,
 	text,
 	timestamp,
 	integer,
-	unique,
 	boolean,
 	jsonb,
 	uuid,
 } from "drizzle-orm/pg-core";
 
 export const aiModelEnum = pgEnum("ai_model_enum", [
-	"OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
-	"meta-llama/Meta-Llama-3-8B-Instruct",
-	"mistralai/Mistral-7B-Instruct-v0.1",
 	"qwen/Qwen2.5-72B-Instruct",
 	"qwen/Qwen2.5-Coder-32B-Instruct",
 	"deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
 	"meta-llama/Llama-3.3-70B-Instruct",
 	"mistralai/Mistral-Nemo-Instruct-2407",
 	"mistralai/Mistral-7B-Instruct-v0.3",
-	"google/gemma-2-27b-it",
 	"microsoft/Phi-3-mini-4k-instruct",
+	"google/gemma-2-27b-it",
 ]);
 export const chatConversationMessageActorEnum = pgEnum(
 	"chat_conversation_message_actor_enum",
@@ -68,17 +65,6 @@ export const projectType = pgEnum("project_type", [
 	"web-service",
 	"web-app",
 ]);
-
-export const chatConversation = pgTable("chat_conversation", {
-	id: serial("id").primaryKey().notNull(),
-	name: text("name").notNull(),
-	model: aiModelEnum("model").notNull(),
-	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-	neptunUserId: integer("neptun_user_id")
-		.notNull()
-		.references(() => neptunUser.id, { onDelete: "cascade" }),
-});
 
 export const neptunUser = pgTable(
 	"neptun_user",
@@ -140,6 +126,17 @@ export const chatConversationFile = pgTable("chat_conversation_file", {
 	neptunUserFileId: integer("neptun_user_file_id")
 		.notNull()
 		.references(() => neptunUserFile.id, { onDelete: "cascade" }),
+});
+
+export const chatConversation = pgTable("chat_conversation", {
+	id: serial("id").primaryKey().notNull(),
+	name: text("name").notNull(),
+	model: text("model").notNull(),
+	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+	neptunUserId: integer("neptun_user_id")
+		.notNull()
+		.references(() => neptunUser.id, { onDelete: "cascade" }),
 });
 
 export const githubAppInstallation = pgTable("github_app_installation", {
@@ -218,7 +215,6 @@ export const neptunContextImport = pgTable("neptun_context_import", {
 	importStatus: text("import_status").default("pending").notNull(),
 	errorMessage: text("error_message"),
 	fileTree: jsonb("file_tree"),
-	excludePatterns: text("exclude_patterns").array(),
 	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 	updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
 	neptunUserId: integer("neptun_user_id")

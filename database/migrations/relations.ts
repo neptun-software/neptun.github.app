@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm/relations";
 import {
 	neptunUser,
-	chatConversation,
 	neptunUserOauthAccount,
 	chatConversationMessage,
+	chatConversation,
 	chatConversationFile,
 	neptunUserFile,
 	githubAppInstallation,
@@ -21,25 +21,21 @@ import {
 	chatConversationShareWhitelistEntry,
 } from "./schema.js";
 
-export const chatConversationRelations = relations(
-	chatConversation,
-	({ one, many }) => ({
+export const neptunUserOauthAccountRelations = relations(
+	neptunUserOauthAccount,
+	({ one }) => ({
 		neptunUser: one(neptunUser, {
-			fields: [chatConversation.neptunUserId],
+			fields: [neptunUserOauthAccount.neptunUserId],
 			references: [neptunUser.id],
 		}),
-		chatConversationMessages: many(chatConversationMessage),
-		chatConversationFiles: many(chatConversationFile),
-		projectChatConversations: many(projectChatConversation),
-		chatConversationShares: many(chatConversationShare),
 	}),
 );
 
 export const neptunUserRelations = relations(neptunUser, ({ many }) => ({
-	chatConversations: many(chatConversation),
 	neptunUserOauthAccounts: many(neptunUserOauthAccount),
 	chatConversationMessages: many(chatConversationMessage),
 	chatConversationFiles: many(chatConversationFile),
+	chatConversations: many(chatConversation),
 	githubAppInstallations: many(githubAppInstallation),
 	neptunContextFiles: many(neptunContextFile),
 	neptunContextImports: many(neptunContextImport),
@@ -51,16 +47,6 @@ export const neptunUserRelations = relations(neptunUser, ({ many }) => ({
 		chatConversationShareWhitelistEntry,
 	),
 }));
-
-export const neptunUserOauthAccountRelations = relations(
-	neptunUserOauthAccount,
-	({ one }) => ({
-		neptunUser: one(neptunUser, {
-			fields: [neptunUserOauthAccount.neptunUserId],
-			references: [neptunUser.id],
-		}),
-	}),
-);
 
 export const chatConversationMessageRelations = relations(
 	chatConversationMessage,
@@ -74,6 +60,20 @@ export const chatConversationMessageRelations = relations(
 			references: [chatConversation.id],
 		}),
 		chatConversationFiles: many(chatConversationFile),
+	}),
+);
+
+export const chatConversationRelations = relations(
+	chatConversation,
+	({ one, many }) => ({
+		chatConversationMessages: many(chatConversationMessage),
+		chatConversationFiles: many(chatConversationFile),
+		neptunUser: one(neptunUser, {
+			fields: [chatConversation.neptunUserId],
+			references: [neptunUser.id],
+		}),
+		projectChatConversations: many(projectChatConversation),
+		chatConversationShares: many(chatConversationShare),
 	}),
 );
 
@@ -258,13 +258,13 @@ export const neptunUserTemplateRelations = relations(
 			fields: [neptunUserTemplate.neptunUserId],
 			references: [neptunUser.id],
 		}),
-		neptunUserTemplateCollection: one(neptunUserTemplateCollection, {
-			fields: [neptunUserTemplate.templateCollectionId],
-			references: [neptunUserTemplateCollection.id],
-		}),
 		neptunUserFile: one(neptunUserFile, {
 			fields: [neptunUserTemplate.userFileId],
 			references: [neptunUserFile.id],
+		}),
+		neptunUserTemplateCollection: one(neptunUserTemplateCollection, {
+			fields: [neptunUserTemplate.templateCollectionId],
+			references: [neptunUserTemplateCollection.id],
 		}),
 	}),
 );
