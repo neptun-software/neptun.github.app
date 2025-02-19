@@ -12,14 +12,18 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const aiModelEnum = pgEnum("ai_model_enum", [
+	"google/gemma-2-27b-it",
 	"qwen/Qwen2.5-72B-Instruct",
 	"qwen/Qwen2.5-Coder-32B-Instruct",
 	"deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
-	"meta-llama/Llama-3.3-70B-Instruct",
 	"mistralai/Mistral-Nemo-Instruct-2407",
 	"mistralai/Mistral-7B-Instruct-v0.3",
 	"microsoft/Phi-3-mini-4k-instruct",
-	"google/gemma-2-27b-it",
+	"cloudflare/llama-3.3-70b-instruct-fp8-fast",
+	"openrouter/gemini-2.0-pro-exp-02-05",
+	"openrouter/deepseek-chat",
+	"openrouter/llama-3.3-70b-instruct",
+	"openrouter/llama-3.1-nemotron-70b-instruct",
 ]);
 export const chatConversationMessageActorEnum = pgEnum(
 	"chat_conversation_message_actor_enum",
@@ -105,9 +109,7 @@ export const chatConversationMessage = pgTable("chat_conversation_message", {
 	neptunUserId: integer("neptun_user_id")
 		.notNull()
 		.references(() => neptunUser.id, { onDelete: "cascade" }),
-	chatConversationId: integer("chat_conversation_id")
-		.notNull()
-		.references(() => chatConversation.id, { onDelete: "cascade" }),
+	chatConversationId: integer("chat_conversation_id").notNull(),
 });
 
 export const chatConversationFile = pgTable("chat_conversation_file", {
@@ -117,15 +119,9 @@ export const chatConversationFile = pgTable("chat_conversation_file", {
 	neptunUserId: integer("neptun_user_id")
 		.notNull()
 		.references(() => neptunUser.id, { onDelete: "cascade" }),
-	chatConversationId: integer("chat_conversation_id")
-		.notNull()
-		.references(() => chatConversation.id, { onDelete: "cascade" }),
-	chatConversationMessageId: integer("chat_conversation_message_id")
-		.notNull()
-		.references(() => chatConversationMessage.id, { onDelete: "cascade" }),
-	neptunUserFileId: integer("neptun_user_file_id")
-		.notNull()
-		.references(() => neptunUserFile.id, { onDelete: "cascade" }),
+	chatConversationId: integer("chat_conversation_id").notNull(),
+	chatConversationMessageId: integer("chat_conversation_message_id").notNull(),
+	neptunUserFileId: integer("neptun_user_file_id").notNull(),
 });
 
 export const chatConversation = pgTable("chat_conversation", {
@@ -175,9 +171,7 @@ export const githubAppInstallationRepository = pgTable(
 		).notNull(),
 		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-		githubAppInstallationId: integer("github_app_installation_id")
-			.notNull()
-			.references(() => githubAppInstallation.id, { onDelete: "cascade" }),
+		githubAppInstallationId: integer("github_app_installation_id").notNull(),
 	},
 );
 
@@ -242,21 +236,15 @@ export const projectChatConversation = pgTable("project_chat_conversation", {
 	projectId: integer("project_id")
 		.notNull()
 		.references(() => neptunUserProject.id, { onDelete: "cascade" }),
-	chatConversationId: integer("chat_conversation_id")
-		.notNull()
-		.references(() => chatConversation.id, { onDelete: "cascade" }),
+	chatConversationId: integer("chat_conversation_id").notNull(),
 	createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 
 export const projectGithubInstallation = pgTable(
 	"project_github_installation",
 	{
-		projectId: integer("project_id")
-			.notNull()
-			.references(() => neptunUserProject.id, { onDelete: "cascade" }),
-		githubInstallationId: integer("github_installation_id")
-			.notNull()
-			.references(() => githubAppInstallation.id, { onDelete: "cascade" }),
+		projectId: integer("project_id").notNull(),
+		githubInstallationId: integer("github_installation_id").notNull(),
 		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 	},
 );
@@ -264,14 +252,8 @@ export const projectGithubInstallation = pgTable(
 export const projectTemplateCollection = pgTable(
 	"project_template_collection",
 	{
-		projectId: integer("project_id")
-			.notNull()
-			.references(() => neptunUserProject.id, { onDelete: "cascade" }),
-		templateCollectionId: integer("template_collection_id")
-			.notNull()
-			.references(() => neptunUserTemplateCollection.id, {
-				onDelete: "cascade",
-			}),
+		projectId: integer("project_id").notNull(),
+		templateCollectionId: integer("template_collection_id").notNull(),
 		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 	},
 );
@@ -295,10 +277,7 @@ export const neptunUserTemplate = pgTable("neptun_user_template", {
 	neptunUserId: integer("neptun_user_id")
 		.notNull()
 		.references(() => neptunUser.id, { onDelete: "cascade" }),
-	templateCollectionId: integer("template_collection_id").references(
-		() => neptunUserTemplateCollection.id,
-		{ onDelete: "cascade" },
-	),
+	templateCollectionId: integer("template_collection_id"),
 	userFileId: integer("user_file_id").references(() => neptunUserFile.id, {
 		onDelete: "cascade",
 	}),
@@ -314,9 +293,7 @@ export const chatConversationShare = pgTable(
 		hashedPassword: text("hashed_password"),
 		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-		chatConversationId: integer("chat_conversation_id")
-			.notNull()
-			.references(() => chatConversation.id, { onDelete: "cascade" }),
+		chatConversationId: integer("chat_conversation_id").notNull(),
 	},
 	(table) => {
 		return {
@@ -353,9 +330,7 @@ export const neptunUserTemplateCollection = pgTable(
 		shareId: uuid("share_id").defaultRandom().notNull(),
 		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-		neptunUserId: integer("neptun_user_id")
-			.notNull()
-			.references(() => neptunUser.id, { onDelete: "cascade" }),
+		neptunUserId: integer("neptun_user_id").notNull(),
 	},
 	(table) => {
 		return {
@@ -372,11 +347,7 @@ export const chatConversationShareWhitelistEntry = pgTable(
 		id: serial("id").primaryKey().notNull(),
 		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-		whitelistedNeptunUserId: integer("whitelisted_neptun_user_id")
-			.notNull()
-			.references(() => neptunUser.id, { onDelete: "cascade" }),
-		chatConversationShareId: integer("chat_conversation_share_id")
-			.notNull()
-			.references(() => chatConversationShare.id, { onDelete: "cascade" }),
+		whitelistedNeptunUserId: integer("whitelisted_neptun_user_id").notNull(),
+		chatConversationShareId: integer("chat_conversation_share_id").notNull(),
 	},
 );
