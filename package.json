@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "^0.41.0",
     "drizzle-zod": "^0.5.1",
     "postgres": "^3.4.4",
     "probot": "^13.0.1",
